@@ -1,5 +1,6 @@
 import socket
 from socket import AF_INET, SOCK_DGRAM
+from struct import *
 
 # Create a socket object
 s = socket.socket(family=AF_INET, type=SOCK_DGRAM, proto=0)
@@ -43,27 +44,12 @@ LPOSX_OFF = 16
 LPOSY_OFF = 20
 
 # Receive a new position updates broadcast protocol packet from SMCU model
-while packet := bytes(s.recv(24)):
+while packet := s.recv(24):
 
-    # Receive positions values in bytes
-    aposz1 = packet[APOSZ1_OFF: APOSZ1_OFF + APOSZ1_SZ]
-    aposz2 = packet[APOSZ2_OFF: APOSZ2_OFF + APOSZ2_SZ]
-    aposz3 = packet[APOSZ3_OFF: APOSZ3_OFF + APOSZ3_SZ]
-    lposx = packet[LPOSX_OFF: LPOSX_OFF + LPOSX_SZ]
-    lposy = packet[LPOSY_OFF: LPOSY_OFF + LPOSY_SZ]
-
-    # Create an int from bytes
-    i_aposz1 = int.from_bytes(aposz1, byteorder="big", signed=True)
-    i_aposz2 = int.from_bytes(aposz2, byteorder="big", signed=True)
-    i_aposz3 = int.from_bytes(aposz3, byteorder="big", signed=True)
-    i_lposx = int.from_bytes(lposx, byteorder="big", signed=True)
-    i_lposy = int.from_bytes(lposy, byteorder="big", signed=True)
+    # Return a tuple containing integers. The integers refer to positions
+    pos = unpack('>5i', packet[4:25])
 
     print(
-        f"APOSZ1: {i_aposz1}, APOSZ2: {i_aposz2}, APOSZ3: {i_aposz3}, \
-LPOSX: {i_lposx}, LPOSY: {i_lposy}"
+        f"APOSZ1: {pos[0]}, APOSZ2: {pos[1]}, APOSZ3: {pos[2]}, \
+LPOSX: {pos[3]}, LPOSY: {pos[4]}"
         )
-#     print(
-#         f"Bytes --> APOSZ1: {aposz1}, APOSZ2: {aposz2}, APOSZ3: {aposz3}, \
-# LPOSX: {lposx}, LPOSY: {lposy}"
-#         )
