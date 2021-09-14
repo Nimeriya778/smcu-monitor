@@ -2,14 +2,14 @@ import socket
 from socket import AF_INET, SOCK_DGRAM
 from struct import unpack, calcsize
 
-# Create a socket object
-s = socket.socket(family=AF_INET, type=SOCK_DGRAM, proto=0)
-
 # Listen address
 host = "127.0.0.1"
 
 # Reserve a port for UDP protocol
 UDP_PORT = 20817
+
+# Create a socket object
+s = socket.socket(family=AF_INET, type=SOCK_DGRAM, proto=0)
 
 s.bind((host, UDP_PORT))
 
