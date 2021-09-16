@@ -26,9 +26,10 @@ while packet := s.recv(size):
     magic, version, aposz1, aposz2, aposz3, lposx, lposy = pos
 
     # MAGIC is a constant '0xACDC', VERSION is a constant '0x0100'
-    if magic == 0xACDC and version == 0x0100:
+    if magic != 0xACDC and version != 0x0100:
+        continue
 
-        print(
-            f"APOSZ1: {aposz1}, APOSZ2: {aposz2}, APOSZ3: {aposz3}, \
+    print(
+        f"APOSZ1: {aposz1}, APOSZ2: {aposz2}, APOSZ3: {aposz3}, \
 LPOSX: {lposx}, LPOSY: {lposy}"
-            )
+        )
