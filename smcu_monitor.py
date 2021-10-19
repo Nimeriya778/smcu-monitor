@@ -4,16 +4,21 @@
 Receives position updates via UDP
 """
 
+import argparse
+from datetime import datetime
 from socket import socket, AF_INET, SOCK_DGRAM
 from struct import unpack, calcsize
-from datetime import datetime
-from matplotlib import pyplot as plt
+import sys
 
 # Listen address
 DEFAULT_HOST = "127.0.0.1"
 
 # Reserve a port for UDP protocol
 UDP_PORT = 20817
+
+parser = argparse.ArgumentParser(description="Receives position updates via UDP")
+parser.add_argument("--plt", action="store_true", help="Plot position updates")
+args = parser.parse_args()
 
 # Create a socket object
 s = socket(family=AF_INET, type=SOCK_DGRAM, proto=0)
@@ -56,6 +61,13 @@ LPOSX: {lposx}, LPOSY: {lposy}"
 except KeyboardInterrupt:
     print("\nStopped by user")
 
+# Draw plot on demand
+if not args.plt:
+    sys.exit(0)
+
+# pylint: disable=wrong-import-position
+from matplotlib import pyplot as plt
+
 # Creating multiple plots
 fig, ax = plt.subplots()
 
@@ -75,6 +87,8 @@ ax.plot(time_log, z3_log, ".-", label="APOSZ3")
 ax.plot(time_log, x_log, ".-", label="LPOSX")
 ax.plot(time_log, y_log, ".-", label="LPOSY")
 
-# Display plots
+# Show labels
 plt.legend(loc="best")
+
+# Display plots
 plt.show()
