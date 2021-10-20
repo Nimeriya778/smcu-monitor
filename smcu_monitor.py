@@ -18,6 +18,8 @@ UDP_PORT = 20817
 
 parser = argparse.ArgumentParser(description="Receives position updates via UDP")
 parser.add_argument("--plt", action="store_true", help="Plot position updates")
+parser.add_argument("--png", type=str, help="Save plot as PNG")
+parser.add_argument("--pdf", type=str, help="Save plot as PDF")
 args = parser.parse_args()
 
 # Create a socket object
@@ -62,7 +64,7 @@ except KeyboardInterrupt:
     print("\nStopped by user")
 
 # Draw plot on demand
-if not args.plt:
+if not (args.plt or args.png or args.pdf):
     sys.exit(0)
 
 # pylint: disable=wrong-import-position
@@ -90,5 +92,11 @@ ax.plot(time_log, y_log, ".-", label="LPOSY")
 # Show labels
 plt.legend(loc="best")
 
-# Display plots
-plt.show()
+if args.png:
+    plt.savefig(args.png)
+
+if args.pdf:
+    plt.savefig(args.pdf)
+
+if args.plt:
+    plt.show()
