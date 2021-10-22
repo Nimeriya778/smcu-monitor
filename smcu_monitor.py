@@ -11,7 +11,7 @@ from struct import unpack, calcsize
 import sys
 
 # Listen address
-DEFAULT_HOST = "127.0.0.1"
+DEFAULT_HOST = "0.0.0.0"
 
 # Reserve a port for UDP protocol
 UDP_PORT = 20817
@@ -20,12 +20,13 @@ parser = argparse.ArgumentParser(description="Receives position updates via UDP"
 parser.add_argument("--plt", action="store_true", help="Plot position updates")
 parser.add_argument("--png", type=str, help="Save plot as PNG")
 parser.add_argument("--pdf", type=str, help="Save plot as PDF")
+parser.add_argument("--addr", default=DEFAULT_HOST, type=str, help="Listen address")
 args = parser.parse_args()
 
 # Create a socket object
 s = socket(family=AF_INET, type=SOCK_DGRAM, proto=0)
 
-s.bind((DEFAULT_HOST, UDP_PORT))
+s.bind((args.addr, UDP_PORT))
 
 # The UDP diagram payload has data fields described in struct format
 PAYLOAD_FMT = ">HH5i"
