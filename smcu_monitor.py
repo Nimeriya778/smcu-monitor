@@ -5,6 +5,7 @@ Receives position updates via UDP
 """
 
 import argparse
+import csv
 from datetime import datetime
 from socket import socket, AF_INET, SOCK_DGRAM
 from struct import unpack, calcsize
@@ -21,6 +22,7 @@ parser.add_argument("--plt", action="store_true", help="Plot position updates")
 parser.add_argument("--png", type=str, help="Save plot as PNG")
 parser.add_argument("--pdf", type=str, help="Save plot as PDF")
 parser.add_argument("--addr", default=DEFAULT_HOST, type=str, help="Listen address")
+parser.add_argument("--csv", action="store_true", help="Save position updates as CSV")
 args = parser.parse_args()
 
 # Create a socket object
@@ -33,6 +35,7 @@ PAYLOAD_FMT = ">HH5i"
 size = calcsize(PAYLOAD_FMT)
 
 time_log, z1_log, z2_log, z3_log, x_log, y_log = [], [], [], [], [], []
+start_time = datetime.now()
 
 try:
     # Receive a new position updates broadcast protocol packet from SMCU model
@@ -53,8 +56,8 @@ LPOSX: {lposx}, LPOSY: {lposy}"
         )
 
         # Save logs to plot data
-        time = datetime.now()
-        time_log.append(time)
+        real_time = datetime.now()
+        time_log.append(real_time)
         z1_log.append(aposz1)
         z2_log.append(aposz2)
         z3_log.append(aposz3)
@@ -64,9 +67,23 @@ LPOSX: {lposx}, LPOSY: {lposy}"
 except KeyboardInterrupt:
     print("\nStopped by user")
 
+timestamps = []
+for time in time_log:
+    timestamps.append(real_time - start_time)
+
 # Draw plot on demand
-if not (args.plt or args.png or args.pdf):
+if not (args.plt or args.png or args.pdf or args.csv):
     sys.exit(0)
+
+header = ["Time", "APOSZ1", "APOSZ2", "APOSZ3", "LPOSX", "LPOSY"]
+
+with open("logs.csv", mode="w", encoding="utf8") as csvfile:
+    logs_writer = csv.writer(csvfile)
+    logs_writer.writerow(header)
+
+    # Each row contains the update timestamp the corresponding stepper positions
+    for (t, z1, z2, z3, x, y) in zip(timestamps, z1_log, z2_log, z3_log, x_log, y_log):
+        logs_writer.writerow([t, z1, z2, z3, x, y])
 
 # pylint: disable=wrong-import-position
 from matplotlib import pyplot as plt
