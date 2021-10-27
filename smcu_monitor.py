@@ -6,7 +6,7 @@ Receives position updates via UDP
 
 import argparse
 import csv
-from datetime import datetime
+from datetime import datetime, timedelta
 from socket import socket, AF_INET, SOCK_DGRAM
 from struct import unpack, calcsize
 import sys
@@ -34,7 +34,7 @@ s.bind((args.addr, UDP_PORT))
 PAYLOAD_FMT = ">HH5i"
 size = calcsize(PAYLOAD_FMT)
 
-time_log, z1_log, z2_log, z3_log, x_log, y_log = [], [], [], [], [], []
+timestamps, z1_log, z2_log, z3_log, x_log, y_log = [], [], [], [], [], []
 start_time = datetime.now()
 
 try:
@@ -57,7 +57,8 @@ LPOSX: {lposx}, LPOSY: {lposy}"
 
         # Save logs to plot data
         real_time = datetime.now()
-        time_log.append(real_time)
+        sec = timedelta.total_seconds(real_time - start_time)
+        timestamps.append(sec)
         z1_log.append(aposz1)
         z2_log.append(aposz2)
         z3_log.append(aposz3)
@@ -66,10 +67,6 @@ LPOSX: {lposx}, LPOSY: {lposy}"
 
 except KeyboardInterrupt:
     print("\nStopped by user")
-
-timestamps = []
-for time in time_log:
-    timestamps.append(real_time - start_time)
 
 # Draw plot on demand
 if not (args.plt or args.png or args.pdf or args.csv):
@@ -101,11 +98,11 @@ plt.grid(which="minor", linewidth=0.5, linestyle="--")
 plt.grid(which="major", color="grey", linewidth=1)
 plt.gcf().autofmt_xdate()
 
-ax.plot(time_log, z1_log, ".-", label="APOSZ1")
-ax.plot(time_log, z2_log, ".-", label="APOSZ2")
-ax.plot(time_log, z3_log, ".-", label="APOSZ3")
-ax.plot(time_log, x_log, ".-", label="LPOSX")
-ax.plot(time_log, y_log, ".-", label="LPOSY")
+ax.plot(timestamps, z1_log, ".-", label="APOSZ1")
+ax.plot(timestamps, z2_log, ".-", label="APOSZ2")
+ax.plot(timestamps, z3_log, ".-", label="APOSZ3")
+ax.plot(timestamps, x_log, ".-", label="LPOSX")
+ax.plot(timestamps, y_log, ".-", label="LPOSY")
 
 # Show labels
 plt.legend(loc="best")
