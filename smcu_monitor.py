@@ -22,7 +22,7 @@ parser.add_argument("--plt", action="store_true", help="Plot position updates")
 parser.add_argument("--png", type=str, help="Save plot as PNG")
 parser.add_argument("--pdf", type=str, help="Save plot as PDF")
 parser.add_argument("--addr", default=DEFAULT_HOST, type=str, help="Listen address")
-parser.add_argument("--csv", action="store_true", help="Save position updates as CSV")
+parser.add_argument("--csv", type=str, help="Save position updates as CSV")
 args = parser.parse_args()
 
 # Create a socket object
@@ -74,7 +74,7 @@ if not (args.plt or args.png or args.pdf or args.csv):
 
 header = ["Time", "APOSZ1", "APOSZ2", "APOSZ3", "LPOSX", "LPOSY"]
 
-with open("logs.csv", mode="w", encoding="utf8") as csvfile:
+with open(args.csv, mode="w", encoding="utf8") as csvfile:
     logs_writer = csv.writer(csvfile)
     logs_writer.writerow(header)
 

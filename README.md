@@ -12,7 +12,7 @@ Configuration
 The script is configured via the command line arguments as follows:
 
 ```
-usage: smcu_monitor.py [-h] [--plt] [--png PNG] [--pdf PDF] [--addr ADDR] [--csv]
+usage: smcu_monitor.py [-h] [--plt] [--png PNG] [--pdf PDF] [--addr ADDR] [--csv CSV]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -20,6 +20,6 @@ optional arguments:
   --png PNG             Save plot as PNG
   --pdf PDF             Save plot as PDF
   --addr ADDR           Listen address
-  --csv                 Save position updates as CSV
+  --csv CSV             Save position updates as CSV
  
 ```
