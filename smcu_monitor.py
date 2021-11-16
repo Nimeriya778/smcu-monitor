@@ -12,7 +12,7 @@ from struct import unpack, calcsize
 import sys
 
 # Listen address
-DEFAULT_HOST = "0.0.0.0"
+DEFAULT_HOST = "127.0.0.1"
 
 # Reserve a port for UDP protocol
 UDP_PORT = 20817
@@ -23,11 +23,11 @@ parser.add_argument("--png", type=str, help="Save plot as PNG")
 parser.add_argument("--pdf", type=str, help="Save plot as PDF")
 parser.add_argument("--addr", default=DEFAULT_HOST, type=str, help="Listen address")
 parser.add_argument("--csv", type=str, help="Save position updates as CSV")
+parser.add_argument("--relay", type=str, help="Send packets to the address")
 args = parser.parse_args()
 
 # Create a socket object
 s = socket(family=AF_INET, type=SOCK_DGRAM, proto=0)
-
 s.bind((args.addr, UDP_PORT))
 
 # The UDP diagram payload has data fields described in struct format
@@ -54,7 +54,6 @@ try:
             f"APOSZ1: {aposz1}, APOSZ2: {aposz2}, APOSZ3: {aposz3}, \
 LPOSX: {lposx}, LPOSY: {lposy}"
         )
-
         # Save logs to plot data
         real_time = datetime.now()
         sec = timedelta.total_seconds(real_time - start_time)
@@ -64,6 +63,10 @@ LPOSX: {lposx}, LPOSY: {lposy}"
         z3_log.append(aposz3)
         x_log.append(lposx)
         y_log.append(lposy)
+
+        # Relay the packet to afs-server
+        if args.relay:
+            s.sendto(packet, (args.relay, UDP_PORT))
 
 except KeyboardInterrupt:
     print("\nStopped by user")
